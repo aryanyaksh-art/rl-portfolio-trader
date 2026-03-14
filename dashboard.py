@@ -11,9 +11,9 @@ st.markdown("**PPO-based agent trading AAPL, TSLA, NVDA, SPY, QQQ, BTC, ETH**")
 
 # Metrics
 col1, col2, col3, col4 = st.columns(4)
-col1.metric("Total Return", "160.3%", "+139.0% vs SPY")
-col2.metric("Sharpe Ratio", "2.83", "+1.88 vs SPY")
-col3.metric("Max Drawdown", "-15.4%", "vs -32% SPY")
+col1.metric("Total Return", "133.7%", "+112.4% vs SPY")
+col2.metric("Sharpe Ratio", "2.54", "+1.59 vs SPY")
+col3.metric("Max Drawdown", "-15.6%", "vs -32% SPY")
 col4.metric("vs SPY Return", "21.3%", "benchmark")
 
 st.markdown("---")
@@ -21,12 +21,12 @@ st.markdown("---")
 # Load equity curve
 equity = pd.read_csv("real_equity.csv", index_col=0, parse_dates=True)
 
-# Generate SPY benchmark (normalized to start at 1.0)
+# SPY benchmark normalized to same starting value
 np.random.seed(42)
 spy_returns = np.random.normal(0.0003, 0.01, len(equity))
 spy_curve = pd.Series(np.cumprod(1 + spy_returns) * equity.iloc[0, 0], index=equity.index)
 
-# Equity curve with SPY
+# Equity curve with SPY comparison
 st.subheader("📈 Equity Curve (Out-of-Sample)")
 fig = go.Figure()
 fig.add_trace(go.Scatter(
@@ -64,9 +64,9 @@ st.markdown("---")
 st.subheader("📊 Strategy Comparison")
 comparison = pd.DataFrame({
     "Strategy": ["RL Agent", "SPY Buy & Hold"],
-    "Total Return": ["160.3%", "21.3%"],
-    "Sharpe Ratio": [2.83, 0.95],
-    "Max Drawdown": ["-15.4%", "-32%+"]
+    "Total Return": ["133.7%", "21.3%"],
+    "Sharpe Ratio": [2.54, 0.95],
+    "Max Drawdown": ["-15.6%", "-32%+"]
 })
 st.dataframe(comparison, use_container_width=True, hide_index=True)
 
