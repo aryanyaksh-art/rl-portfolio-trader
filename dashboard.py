@@ -26,7 +26,10 @@ equity = pd.read_csv("real_equity.csv", index_col=0, parse_dates=True)
 start = equity.index[0]
 end = equity.index[-1]
 spy_raw = yf.download("SPY", start=start, end=end, auto_adjust=True, progress=False)["Close"]
-spy_curve = spy_raw / spy_raw.iloc[0] * equity.iloc[0, 0]
+spy_raw.index = pd.to_datetime(spy_raw.index)
+equity.index = pd.to_datetime(equity.index)
+spy_reindexed = spy_raw.reindex(equity.index, method="ffill").fillna(method="bfill")
+spy_curve = spy_reindexed / spy_reindexed.iloc[0] * equity.iloc[0, 0]
 
 # Equity curve with real SPY comparison
 st.subheader("📈 Equity Curve (Out-of-Sample)")
