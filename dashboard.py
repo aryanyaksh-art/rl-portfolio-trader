@@ -74,4 +74,20 @@ col2.metric("Max Drawdown (2022)", "-50.1%")
 st.caption("Agent tested on out-of-sample 2022 bear market data.")
 
 st.markdown("---")
+
+# Limitations
+st.subheader("⚠️ Limitations & Honest Caveats")
+st.markdown("""
+| Limitation | Detail |
+|---|---|
+| 🐻 Bear market weakness | Agent is long-only — cannot short, so drawdowns in bear markets are severe (-50.1% in 2022) |
+| 📅 Bull market test period | Out-of-sample test (Mar 2025 – Mar 2026) was predominantly a bull market |
+| 🎯 Survivorship bias | Universe limited to AAPL, TSLA, NVDA, BTC, ETH — all known winners in hindsight |
+| 💸 Optimistic slippage | 0.1% slippage used — real crypto execution costs can be 0.2–0.5%+ |
+| 🔬 Not live tested | Backtests ≠ live trading; no liquidity or order book impact modelled |
+""")
+
+st.markdown("**Next steps:** add short positions, train across multiple market regimes, paper trade live to validate.")
+
+st.markdown("---")
 st.caption("Built by Aryan Yaksh | PPO + Custom Gymnasium Environment | stable-baselines3")
