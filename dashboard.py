@@ -1,9 +1,7 @@
 import streamlit as st
 import pandas as pd
-import numpy as np
 import plotly.graph_objects as go
 import plotly.express as px
-import yfinance as yf
 
 st.set_page_config(page_title="RL Portfolio Trader", layout="wide", page_icon="🤖")
 
@@ -19,26 +17,18 @@ col4.metric("vs SPY Return", "21.3%", "benchmark")
 
 st.markdown("---")
 
-# Load real equity curve
+# Load equity curve
 equity = pd.read_csv("real_equity.csv", index_col=0, parse_dates=True)
 
-# Fetch real SPY data matching equity curve date range
-start = equity.index[0]
-end = equity.index[-1]
-spy_raw = yf.download("SPY", start=start, progress=False, auto_adjust=True)["Close"].dropna()
-spy_raw.index = pd.to_datetime(spy_raw.index)
-equity.index = pd.to_datetime(equity.index)
-spy_curve = spy_raw / spy_raw.iloc[0] * equity.iloc[0, 0]
-
-# Equity curve with real SPY comparison
+# Equity curve with SPY comparison (both already in the CSV)
 st.subheader("📈 Equity Curve (Out-of-Sample)")
 fig = go.Figure()
 fig.add_trace(go.Scatter(
-    x=equity.index, y=equity.iloc[:, 0],
+    x=equity.index, y=equity["portfolio_value"],
     name="RL Agent", line=dict(color="#00ff88", width=2)
 ))
 fig.add_trace(go.Scatter(
-    x=spy_curve.index, y=spy_curve.values,
+    x=equity.index, y=equity["spy_value"],
     name="SPY Buy & Hold", line=dict(color="#ff4444", width=2)
 ))
 fig.update_layout(template="plotly_dark", height=400,
