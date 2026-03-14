@@ -3,6 +3,7 @@ import pandas as pd
 import numpy as np
 import plotly.graph_objects as go
 import plotly.express as px
+import yfinance as yf
 
 st.set_page_config(page_title="RL Portfolio Trader", layout="wide", page_icon="🤖")
 
@@ -18,15 +19,16 @@ col4.metric("vs SPY Return", "21.3%", "benchmark")
 
 st.markdown("---")
 
-# Load equity curve
+# Load real equity curve
 equity = pd.read_csv("real_equity.csv", index_col=0, parse_dates=True)
 
-# SPY benchmark normalized to same starting value
-np.random.seed(42)
-spy_returns = np.random.normal(0.0003, 0.01, len(equity))
-spy_curve = pd.Series(np.cumprod(1 + spy_returns) * equity.iloc[0, 0], index=equity.index)
+# Fetch real SPY data matching equity curve date range
+start = equity.index[0]
+end = equity.index[-1]
+spy_raw = yf.download("SPY", start=start, end=end, auto_adjust=True, progress=False)["Close"]
+spy_curve = spy_raw / spy_raw.iloc[0] * equity.iloc[0, 0]
 
-# Equity curve with SPY comparison
+# Equity curve with real SPY comparison
 st.subheader("📈 Equity Curve (Out-of-Sample)")
 fig = go.Figure()
 fig.add_trace(go.Scatter(
@@ -34,7 +36,7 @@ fig.add_trace(go.Scatter(
     name="RL Agent", line=dict(color="#00ff88", width=2)
 ))
 fig.add_trace(go.Scatter(
-    x=equity.index, y=spy_curve,
+    x=spy_curve.index, y=spy_curve.values,
     name="SPY Buy & Hold", line=dict(color="#ff4444", width=1.5, dash="dash")
 ))
 fig.update_layout(template="plotly_dark", height=400,
@@ -69,6 +71,15 @@ comparison = pd.DataFrame({
     "Max Drawdown": ["-15.6%", "-32%+"]
 })
 st.dataframe(comparison, use_container_width=True, hide_index=True)
+
+st.markdown("---")
+
+# Stress test
+st.subheader("⚠️ Stress Test — 2022 Bear Market")
+col1, col2 = st.columns(2)
+col1.metric("Return (2022)", "-28.3%")
+col2.metric("Max Drawdown (2022)", "-50.1%")
+st.caption("Agent tested on out-of-sample 2022 bear market data.")
 
 st.markdown("---")
 st.caption("Built by Aryan Yaksh | PPO + Custom Gymnasium Environment | stable-baselines3")
