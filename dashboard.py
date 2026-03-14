@@ -25,11 +25,10 @@ equity = pd.read_csv("real_equity.csv", index_col=0, parse_dates=True)
 # Fetch real SPY data matching equity curve date range
 start = equity.index[0]
 end = equity.index[-1]
-spy_raw = yf.download("SPY", start=start, end=end, auto_adjust=True, progress=False)["Close"]
+spy_raw = yf.download("SPY", start=start, progress=False, auto_adjust=True)["Close"].dropna()
 spy_raw.index = pd.to_datetime(spy_raw.index)
 equity.index = pd.to_datetime(equity.index)
-spy_reindexed = spy_raw.reindex(equity.index, method="ffill").fillna(method="bfill")
-spy_curve = spy_reindexed / spy_reindexed.iloc[0] * equity.iloc[0, 0]
+spy_curve = spy_raw / spy_raw.iloc[0] * equity.iloc[0, 0]
 
 # Equity curve with real SPY comparison
 st.subheader("📈 Equity Curve (Out-of-Sample)")
@@ -40,7 +39,7 @@ fig.add_trace(go.Scatter(
 ))
 fig.add_trace(go.Scatter(
     x=spy_curve.index, y=spy_curve.values,
-    name="SPY Buy & Hold", line=dict(color="#ff4444", width=1.5, dash="dash")
+    name="SPY Buy & Hold", line=dict(color="#ff4444", width=2)
 ))
 fig.update_layout(template="plotly_dark", height=400,
     xaxis_title="Date", yaxis_title="Portfolio Value ($)")
